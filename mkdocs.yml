@@ -1,0 +1,36 @@
+site_name: Developer Documentation
+site_author: Felix Bole
+site_description: A collection of coding standards, testing practices, and version control guidelines for VisionsTrust developers.
+copyright: Visions 2024
+exclude_docs: ./docs/site/
+docs_dir: ./documentation
+site_dir: ./docs
+theme: 
+  name: material
+  features:
+    - content.action.edit
+    - content.action.view
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Coding Standards:
+    - General:
+      - Naming Conventions: coding-standards/naming-conventions.md
+      - File Structure: coding-standards/file-structure.md
+      - Formatting: coding-standards/formatting.md
+      - Comments: coding-standards/comments.md
+    - React:
+      - Context: coding-standards/react/context.md
+      - Hooks: coding-standards/react/hooks.md
+    - Tanstack Query:
+      - Queries: coding-standards/tanstack/queries.md
+      - Mutation: coding-standards/tanstack/mutations.md
+  - Testing:
+    - Good Practices: testing/good-practices.md
+  - Version Control:
+    - Branch Naming: version-control/branch-naming.md
+    - Conventional Commits: version-control/conventional-commits.md
+    - Pull Requests: version-control/pull-requests.md
+    - Version Management: version-control/version-management.md
+    
