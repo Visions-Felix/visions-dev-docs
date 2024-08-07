@@ -1051,32 +1051,85 @@
 </ol>
 <h2 id="comments-for-components">Comments for Components</h2>
 <p>For React components, add comments especially when the component is complex or involves intricate logic.</p>
+<p>Currently, this is not the case, but ideally we want to have some specific custom jsdoc tags for hooks as per the following specification:</p>
+<table>
+<thead>
+<tr>
+<th>Tag</th>
+<th>Requirement</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>@requiresContext</td>
+<td>Required for children of Providers</td>
+<td>A list of context Providers that need to be encapsulating this component. This is important as it defines the reusability of the component easily by reading its documentation.</td>
+</tr>
+<tr>
+<td>@todo</td>
+<td>Required if pending actions</td>
+<td>The @todo enables for a quick search in the project to see where there are pending actions to be done. The tag is required if the component has pending actions. The description of the todo should be defined under the tag.</td>
+</tr>
+<tr>
+<td>@unstable</td>
+<td>Optional</td>
+<td>Optional but required if the component is known to have unexpected behaviours</td>
+</tr>
+<tr>
+<td>@example</td>
+<td>Optional</td>
+<td>Defines an example usage for the component. This is an optional tag but is required when the component if of high complexity and the comments of the props are not enough to define how it should be used</td>
+</tr>
+<tr>
+<td>@deprecated</td>
+<td>Optional</td>
+<td>This tag should be used if a component is not to be used anymore but kept in the code because it is waiting for a refactoring. The description should define what to use in favor of the deprecation.</td>
+</tr>
+</tbody>
+</table>
 <h3 id="example">Example</h3>
+<p>Below is a generic example using all tags.</p>
 <pre><code class="language-tsx">/**
- * UserProfile component displays the user's profile information.
+ * Displays the user's profile information.
  *
- * @component
+ * @todo
+ * Add user Avatar in the profile
+ * Review the unstability issues
+ *
+ * @requiresContext
+ *  - ThemeProvider
+ * 
+ * @unstable
+ * Sometimes breaks if the user name is too long
+ * 
+ * @deprecated
+ * Use UserProfile instead
+ *
  * @example
  * const user = {
  *   name: 'John Doe',
  *   age: 30,
  *   email: 'john.doe@example.com'
  * }
- * return &lt;UserProfile user={user} /&gt;
+ * return &lt;UserProfileLegacy user={user} /&gt;
+ *
  */
-const UserProfile = ({ user }: { user: User }) =&gt; {
-  // Display user's profile information
-  return (
-    &lt;div&gt;
-      &lt;h1&gt;{user.name}&lt;/h1&gt;
-      &lt;p&gt;Age: {user.age}&lt;/p&gt;
-      &lt;p&gt;Email: {user.email}&lt;/p&gt;
-    &lt;/div&gt;
-  );
+const UserProfileLegacy = ({ user }: { user: User }) =&gt; {
+    const { theme } = useTheme();
+
+    // Display user's profile information
+    return (
+        &lt;div&gt;
+            &lt;h1&gt;{user.name}&lt;/h1&gt;
+            &lt;p&gt;Age: {user.age}&lt;/p&gt;
+            &lt;p&gt;Email: {user.email}&lt;/p&gt;
+        &lt;/div&gt;
+    );
 };
 </code></pre>
 <blockquote>
-<p><em>Note: @example &amp; @component tags are optional but required when a component is of high complexity.</em></p>
+<p><em>Note: @example tag is optional but required when a component is of high complexity.</em></p>
 </blockquote>
 <h2 id="comments-for-hooks">Comments for Hooks</h2>
 <p>For custom hooks, document the props (if any) and the methods returned by the hook. Define a TypeScript type for the return value and use JSDoc to document the type.</p>
@@ -1085,27 +1138,27 @@ const UserProfile = ({ user }: { user: User }) =&gt; {
  * Return type for useAuth hook, containing the authentication state and methods.
  */
 type UseAuthReturnType = {
-  /**
-   * Indicates if the user is authenticated.
-   */
-  isAuthenticated: boolean;
+    /**
+     * Indicates if the user is authenticated.
+     */
+    isAuthenticated: boolean;
 
-  /**
-   * Function to log in the user.
-   *
-   * @param {User} userInfo - The user's information.
-   */
-  login: (userInfo: User) =&gt; void;
+    /**
+     * Function to log in the user.
+     *
+     * @param {User} userInfo - The user's information.
+     */
+    login: (userInfo: User) =&gt; void;
 
-  /**
-   * Function to log out the user.
-   */
-  logout: () =&gt; void;
+    /**
+     * Function to log out the user.
+     */
+    logout: () =&gt; void;
 
-  /**
-   * The authenticated user's information.
-   */
-  user: User | null;
+    /**
+     * The authenticated user's information.
+     */
+    user: User | null;
 };
 
 /**
@@ -1117,51 +1170,51 @@ type UseAuthReturnType = {
  * const { isAuthenticated, login, logout, user } = useAuth();
  */
 const useAuth = (): UseAuthReturnType =&gt; {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState&lt;User | null&gt;(null);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [user, setUser] = useState&lt;User | null&gt;(null);
 
-  const login = (userInfo: User) =&gt; {
-    setIsAuthenticated(true);
-    setUser(userInfo);
-  };
+    const login = (userInfo: User) =&gt; {
+        setIsAuthenticated(true);
+        setUser(userInfo);
+    };
 
-  const logout = () =&gt; {
-    setIsAuthenticated(false);
-    setUser(null);
-  };
+    const logout = () =&gt; {
+        setIsAuthenticated(false);
+        setUser(null);
+    };
 
-  return { isAuthenticated, login, logout, user };
+    return { isAuthenticated, login, logout, user };
 };
 </code></pre>
 <h2 id="comments-for-providers">Comments for Providers</h2>
-<p>Context providers <strong>MUST</strong> be thoroughly documented on everything the context provides, the methods used within it. Comments detailing the functionality for complex logic <strong>MUST</strong> be included. </p>
+<p>Context providers <strong>MUST</strong> be thoroughly documented on everything the context provides, the methods used within it. Comments detailing the functionality for complex logic <strong>MUST</strong> be included.</p>
 <p>A context provider <strong>MUST</strong> have a specific type detailing the context value and <strong>all</strong> attributes should be documented on the type for the users of the context to be able to have a reference documentation when accessing a value of the context.</p>
 <h3 id="example_2">Example</h3>
 <pre><code class="language-tsx">/**
  * Context value type for AuthProvider, providing authentication state and methods.
  */
 type AuthContextType = {
-  /**
-   * Indicates if the user is authenticated.
-   */
-  isAuthenticated: boolean;
+    /**
+     * Indicates if the user is authenticated.
+     */
+    isAuthenticated: boolean;
 
-  /**
-   * Function to log in the user.
-   *
-   * @param {User} userInfo - The user's information.
-   */
-  login: (userInfo: User) =&gt; void;
+    /**
+     * Function to log in the user.
+     *
+     * @param {User} userInfo - The user's information.
+     */
+    login: (userInfo: User) =&gt; void;
 
-  /**
-   * Function to log out the user.
-   */
-  logout: () =&gt; void;
+    /**
+     * Function to log out the user.
+     */
+    logout: () =&gt; void;
 
-  /**
-   * The authenticated user's information.
-   */
-  user: User | null;
+    /**
+     * The authenticated user's information.
+     */
+    user: User | null;
 };
 
 const AuthContext = createContext&lt;AuthContextType | undefined&gt;(undefined);
@@ -1174,59 +1227,41 @@ const AuthContext = createContext&lt;AuthContextType | undefined&gt;(undefined);
  *   &lt;App /&gt;
  * &lt;/AuthProvider&gt;
  */
-const AuthProvider = ({ children }: { children: React.ReactNode }): JSX.Element =&gt; {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState&lt;User | null&gt;(null);
+const AuthProvider = ({
+    children,
+}: {
+    children: React.ReactNode;
+}): JSX.Element =&gt; {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [user, setUser] = useState&lt;User | null&gt;(null);
 
-  /**
-   * Logs in the user and updates the authentication state.
-   *
-   * @param {User} userInfo - The user's information.
-   */
-  const login = (userInfo: User) =&gt; {
-    setIsAuthenticated(true);
-    setUser(userInfo);
-  };
+    /**
+     * Logs in the user and updates the authentication state.
+     *
+     * @param {User} userInfo - The user's information.
+     */
+    const login = (userInfo: User) =&gt; {
+        setIsAuthenticated(true);
+        setUser(userInfo);
+    };
 
-  /**
-   * Logs out the user and clears the authentication state.
-   */
-  const logout = () =&gt; {
-    setIsAuthenticated(false);
-    setUser(null);
-  };
+    /**
+     * Logs out the user and clears the authentication state.
+     */
+    const logout = () =&gt; {
+        setIsAuthenticated(false);
+        setUser(null);
+    };
 
-  return (
-    &lt;AuthContext.Provider value={{ isAuthenticated, login, logout, user }}&gt;
-      {children}
-    &lt;/AuthContext.Provider&gt;
-  );
+    return (
+        &lt;AuthContext.Provider value={{ isAuthenticated, login, logout, user }}&gt;
+            {children}
+        &lt;/AuthContext.Provider&gt;
+    );
 };
 </code></pre>
 <h3 id="complex-logic-example">Complex Logic Example</h3>
-<pre><code class="language-tsx">/**
- * Context value type for DataProvider, providing fetched data and loading state.
- */
-type DataContextType = {
-  /**
-   * The fetched data.
-   */
-  data: any[];
-
-  /**
-   * Indicates if data is currently being loaded.
-   */
-  isLoading: boolean;
-};
-
-const DataContext = createContext&lt;DataContextType | undefined&gt;(undefined);
-
-type Props = {
-    /**
-     * Defines whether or not to activate this provider on page load (example definition)
-     */
-    active: string;
-}
+<pre><code class="language-tsx">const DataContext = createContext&lt;DataContextType | undefined&gt;(undefined);
 
 /**
  * DataProvider component that fetches and provides data to its children.
@@ -1237,38 +1272,58 @@ type Props = {
  * &lt;/DataProvider&gt;
  */
 const DataProvider = (props: PropsWithChildren&lt;Props&gt;): JSX.Element =&gt; {
-  const [data, setData] = useState&lt;any[]&gt;([]);
-  const [isLoading, setIsLoading] = useState(true);
+    const [data, setData] = useState&lt;any[]&gt;([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() =&gt; {
-    /**
-     * Fetches data from the API.
-     *
-     * @async
-     * @function fetchData
-     * @returns {Promise&lt;void&gt;}
-     */
-    const fetchData = async () =&gt; {
-      try {
-        const response = await fetch('/api/data');
-        const result = await response.json();
-        setData(result);
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Failed to fetch data:', error);
-        setIsLoading(false);
-      }
-    };
+    useEffect(() =&gt; {
+        /**
+         * Fetches data from the API.
+         */
+        const fetchData = async () =&gt; {
+            try {
+                const response = await fetch(&quot;/api/data&quot;);
+                const result = await response.json();
+                setData(result);
+                setIsLoading(false);
+            } catch (error) {
+                console.error(&quot;Failed to fetch data:&quot;, error);
+                setIsLoading(false);
+            }
+        };
 
-    fetchData();
-  }, []);
+        fetchData();
+    }, []);
 
-  return (
-    &lt;DataContext.Provider value={{ data, isLoading }}&gt;
-      {children}
-    &lt;/DataContext.Provider&gt;
-  );
+    return (
+        &lt;DataContext.Provider value={{ data, isLoading }}&gt;
+            {children}
+        &lt;/DataContext.Provider&gt;
+    );
 };
+
+type Props = {
+    /**
+     * Defines whether or not to activate this provider on page load (example definition)
+     */
+    active: string;
+};
+
+
+/**
+ * Context value type for DataProvider, providing fetched data and loading state.
+ */
+type DataContextType = {
+    /**
+     * The fetched data.
+     */
+    data: any[];
+
+    /**
+     * Indicates if data is currently being loaded.
+     */
+    isLoading: boolean;
+};
+
 </code></pre>
 <h2 id="summary">Summary</h2>
 <ul>
